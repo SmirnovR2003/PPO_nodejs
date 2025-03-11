@@ -1,365 +1,274 @@
-# How to Develop a Simple Web Application Using Docker, Nginx, PHP and MongoDB 
+### Updated API Documentation (Using POST for All Methods)
 
-The repository contains files for preparing the environment and running a simple PHP script. 
-
-The application runs with Nginx + PHP-fpm 8.2 + MongoDB 6, the environment is run with Docker compose. It also uses Composer to include the required MongoDB packages. 
-
-The application gets access data from environment variables, connects to the database and writes 1000 documents to the database. 
-
-That's it! However, it's a good starting point to do something more.
-
-## Installation
-
-1. Clone the repository and navigate to the project folder.
-
-2. Run Image build from Dockerfile
-
-```
-docker build -t php8.2-fpm-mongo .
-```
-
-3. Run docker-compose
-
-```
-docker-compose up -d
-```
-
-4. Connect to a container with PHP-fpm
-
-```
-docker exec -it [php-fpm-container-name] bash
-```
-
-5. Install the Composer packages needed for the application (composer.json)
-
-```
-composer install
-```
-
-6. Open localhost in your browser
-
-7. Enjoy modifying the index.php script and checking the result by simply reloading the localhost page in your browser
-
-8. Stop docker-compose after experimenting
-
-```
-docker-compose down
-```
-
-
-
-# API Documentation
-
-## Overview
-Этот API предоставляет функциональность для управления пользователями, визитками и историей просмотров. Все данные хранятся в MongoDB. API поддерживает стандартные CRUD-операции (Create, Read, Update, Delete) для каждой сущности.
+This document provides detailed information about the API endpoints, request/response formats, and examples for the provided application structure. All methods now use the `POST` HTTP method.
 
 ---
 
-## Base URL
-`http://yourdomain.com/api`
-
----
-
-## Authentication
-API не требует аутентификации для выполнения запросов.
-
----
-
-## Endpoints
-
-### 1. **User Management**
-
-#### 1.1. Create a User
-**URL:** `/api/index.php?action=user.create`
-
-**Method:** `POST`
-
-**Description:** Создает нового пользователя.
-
-**Request Body:**
-```json
-{
-    "name": "John Doe",
-    "email": "john.doe@example.com"
-}
+## **Base URL**
+All API requests should be made to the base URL:
 ```
-
-**Response:**
-```json
-{
-    "id": "651a1b2c3d4e5f6a7b8c9d0e"
-}
+http://localhost:3000/
 ```
 
 ---
 
-#### 1.2. Get a User
-**URL:** `/api/index.php?action=user.read&id=651a1b2c3d4e5f6a7b8c9d0e`
-
-**Method:** `GET`
-
-**Description:** Возвращает данные пользователя по его ID.
-
-**Response:**
-```json
-{
-    "_id": "651a1b2c3d4e5f6a7b8c9d0e",
-    "name": "John Doe",
-    "email": "john.doe@example.com"
-}
+## **General Request Format**
+All requests must include an `action` parameter, which specifies the controller and method to be executed. The format is:
 ```
+action = <controller>.<method>
+```
+- `<controller>`: The name of the controller (e.g., `businessCard`, `viewHistory`).
+- `<method>`: The method to be called (e.g., `create`, `read`, `update`, `delete`).
+
+All requests must be sent using the `POST` method.
 
 ---
 
-#### 1.3. Get All Users
-**URL:** `/api/index.php?action=user.read`
+## **Error Responses**
+If the `action` parameter is missing or invalid, the API will return an error response with one of the following status codes:
+- `400 Bad Request`: Missing or invalid `action` parameter.
+- `404 Not Found`: Controller or method not found.
 
-**Method:** `GET`
+---
 
-**Description:** Возвращает список всех пользователей.
+## **Controllers and Methods**
 
-**Response:**
-```json
-[
+### **1. Business Card Controller**
+Manages business card-related operations.
+
+#### **1.1 Create Business Card**
+- **Action**: `businessCard.create`
+- **Method**: `POST`
+- **Request Body**:
+  ```json
+  {
+    "action": "businessCard.create",
+    "data": {
+      "userId": "user_id",
+      "data": {} // Business card data
+    }
+  }
+  ```
+- **Response**:
+  ```json
+  {
+    "id": "business_card_id"
+  }
+  ```
+
+#### **1.2 Read Business Card**
+- **Action**: `businessCard.read`
+- **Method**: `POST`
+- **Request Body**:
+  ```json
+  {
+    "action": "businessCard.read",
+    "id": "business_card_id", // Optional
+    "userId": "user_id" // Optional
+  }
+  ```
+- **Response**:
+  - If `id` or `userId` is provided:
+    ```json
     {
-        "_id": "651a1b2c3d4e5f6a7b8c9d0e",
-        "name": "John Doe",
-        "email": "john.doe@example.com"
+      "_id": "business_card_id",
+      "userId": "user_id",
+      "data": {}
+    }
+    ```
+  - If neither `id` nor `userId` is provided (returns all business cards):
+    ```json
+    [
+      {
+        "_id": "business_card_id_1",
+        "userId": "user_id_1",
+        "data": {}
+      },
+      {
+        "_id": "business_card_id_2",
+        "userId": "user_id_2",
+        "data": {}
+      }
+    ]
+    ```
+
+#### **1.3 Update Business Card**
+- **Action**: `businessCard.update`
+- **Method**: `POST`
+- **Request Body**:
+  ```json
+  {
+    "action": "businessCard.update",
+    "id": "business_card_id",
+    "data": {
+      "userId": "user_id",
+      "data": {} // Updated business card data
+    }
+  }
+  ```
+- **Response**:
+  ```json
+  {
+    "modifiedCount": 1
+  }
+  ```
+
+#### **1.4 Delete Business Card**
+- **Action**: `businessCard.delete`
+- **Method**: `POST`
+- **Request Body**:
+  ```json
+  {
+    "action": "businessCard.delete",
+    "id": "business_card_id"
+  }
+  ```
+- **Response**:
+  ```json
+  {
+    "deletedCount": 1
+  }
+  ```
+
+---
+
+### **2. View History Controller**
+Manages view history-related operations.
+
+#### **2.1 Add View**
+- **Action**: `viewHistory.addView`
+- **Method**: `POST`
+- **Request Body**:
+  ```json
+  {
+    "action": "viewHistory.addView",
+    "userId": "user_id",
+    "cardId": "business_card_id"
+  }
+  ```
+- **Response**:
+  ```json
+  {
+    "status": "success"
+  }
+  ```
+
+#### **2.2 Get Views**
+- **Action**: `viewHistory.getViews`
+- **Method**: `POST`
+- **Request Body**:
+  ```json
+  {
+    "action": "viewHistory.getViews",
+    "userId": "user_id"
+  }
+  ```
+- **Response**:
+  ```json
+  [
+    {
+      "_id": "business_card_id_1",
+      "userId": "user_id",
+      "data": {}
     },
     {
-        "_id": "651a1b2c3d4e5f6a7b8c9d0f",
-        "name": "Jane Doe",
-        "email": "jane.doe@example.com"
+      "_id": "business_card_id_2",
+      "userId": "user_id",
+      "data": {}
     }
-]
-```
+  ]
+  ```
 
 ---
 
-#### 1.4. Update a User
-**URL:** `/api/index.php?action=user.update&id=651a1b2c3d4e5f6a7b8c9d0e`
-
-**Method:** `PUT`
-
-**Description:** Обновляет данные пользователя.
-
-**Request Body:**
-```json
-{
-    "name": "John Smith"
-}
-```
-
-**Response:**
-```json
-{
-    "modifiedCount": 1
-}
-```
+## **Error Codes**
+| Code | Message                          | Description                                      |
+|------|----------------------------------|--------------------------------------------------|
+| 400  | `Action parameter is required`   | Missing `action` parameter.                      |
+| 400  | `Data is required for create`    | Missing `data` in create requests.               |
+| 400  | `ID is required`                 | Missing `id` in update/delete requests.          |
+| 400  | `ID and data are required`       | Missing `id` or `data` in update requests.       |
+| 404  | `Controller not found`           | Invalid controller name in `action`.             |
+| 404  | `Method not found`               | Invalid method name in `action`.                 |
+| 404  | `Resource not found`             | Requested resource (e.g., card) not found.       |
 
 ---
 
-#### 1.5. Delete a User
-**URL:** `/api/index.php?action=user.delete&id=651a1b2c3d4e5f6a7b8c9d0e`
+## **Examples**
 
-**Method:** `DELETE`
-
-**Description:** Удаляет пользователя по его ID.
-
-**Response:**
-```json
-{
-    "deletedCount": 1
-}
-```
-
----
-
-### 2. **Business Card Management**
-
-#### 2.1. Create a Business Card
-**URL:** `/api/index.php?action=businessCard.create`
-
-**Method:** `POST`
-
-**Description:** Создает новую визитку.
-
-**Request Body:**
-```json
-{
-    "title": "Business Card 1",
-    "content": "Sample content"
-}
-```
-
-**Response:**
-```json
-{
-    "id": "651a1b2c3d4e5f6a7b8c9d0e"
-}
-```
-
----
-
-#### 2.2. Get a Business Card
-**URL:** `/api/index.php?action=businessCard.read&id=651a1b2c3d4e5f6a7b8c9d0e`
-
-**Method:** `GET`
-
-**Description:** Возвращает данные визитки по её ID.
-
-**Response:**
-```json
-{
-    "_id": "651a1b2c3d4e5f6a7b8c9d0e",
-    "title": "Business Card 1",
-    "content": "Sample content"
-}
-```
-
----
-
-#### 2.3. Get All Business Cards
-**URL:** `/api/index.php?action=businessCard.read`
-
-**Method:** `GET`
-
-**Description:** Возвращает список всех визиток.
-
-**Response:**
-```json
-[
-    {
-        "_id": "651a1b2c3d4e5f6a7b8c9d0e",
+### **Create Business Card**
+```bash
+curl -X POST http://localhost:3000/ \
+  -H "Content-Type: application/json" \
+  -d '{
+    "action": "businessCard.create",
+    "data": {
+      "userId": "12345",
+      "data": {
         "title": "Business Card 1",
         "content": "Sample content"
-    },
-    {
-        "_id": "651a1b2c3d4e5f6a7b8c9d0f",
-        "title": "Business Card 2",
-        "content": "Another content"
+      }
     }
-]
+  }'
 ```
 
----
-
-#### 2.4. Update a Business Card
-**URL:** `/api/index.php?action=businessCard.update&id=651a1b2c3d4e5f6a7b8c9d0e`
-
-**Method:** `PUT`
-
-**Description:** Обновляет данные визитки.
-
-**Request Body:**
-```json
-{
-    "title": "Updated Business Card"
-}
+### **Read Business Card**
+```bash
+curl -X POST http://localhost:3000/ \
+  -H "Content-Type: application/json" \
+  -d '{
+    "action": "businessCard.read",
+    "id": "12345"
+  }'
 ```
 
-**Response:**
-```json
-{
-    "modifiedCount": 1
-}
-```
-
----
-
-#### 2.5. Delete a Business Card
-**URL:** `/api/index.php?action=businessCard.delete&id=651a1b2c3d4e5f6a7b8c9d0e`
-
-**Method:** `DELETE`
-
-**Description:** Удаляет визитку по её ID.
-
-**Response:**
-```json
-{
-    "deletedCount": 1
-}
-```
-
----
-
-### 3. **View History Management**
-
-#### 3.1. Add a View
-**URL:** `/api/index.php?action=viewHistory.addView&userId=651a1b2c3d4e5f6a7b8c9d0e&cardId=651a1b2c3d4e5f6a7b8c9d0f`
-
-**Method:** `POST`
-
-**Description:** Добавляет запись о просмотре визитки пользователем.
-
-**Response:**
-```json
-{
-    "status": "success"
-}
-```
-
----
-
-#### 3.2. Get Views by User
-**URL:** `/api/index.php?action=viewHistory.getViews&userId=651a1b2c3d4e5f6a7b8c9d0e`
-
-**Method:** `GET`
-
-**Description:** Возвращает историю просмотров визиток для пользователя.
-
-**Response:**
-```json
-[
-    {
-        "card_id": "651a1b2c3d4e5f6a7b8c9d0f",
-        "last_viewed_at": "2023-10-01T12:34:56Z"
-    },
-    {
-        "card_id": "651a1b2c3d4e5f6a7b8c9d0e",
-        "last_viewed_at": "2023-10-02T14:20:10Z"
+### **Update Business Card**
+```bash
+curl -X POST http://localhost:3000/ \
+  -H "Content-Type: application/json" \
+  -d '{
+    "action": "businessCard.update",
+    "id": "12345",
+    "data": {
+      "userId": "12345",
+      "data": {
+        "title": "Updated Business Card"
+      }
     }
-]
+  }'
+```
+
+### **Delete Business Card**
+```bash
+curl -X POST http://localhost:3000/ \
+  -H "Content-Type: application/json" \
+  -d '{
+    "action": "businessCard.delete",
+    "id": "12345"
+  }'
+```
+
+### **Add View History**
+```bash
+curl -X POST http://localhost:3000/ \
+  -H "Content-Type: application/json" \
+  -d '{
+    "action": "viewHistory.addView",
+    "userId": "user1",
+    "cardId": "card1"
+  }'
+```
+
+### **Get View History**
+```bash
+curl -X POST http://localhost:3000/ \
+  -H "Content-Type: application/json" \
+  -d '{
+    "action": "viewHistory.getViews",
+    "userId": "user1"
+  }'
 ```
 
 ---
 
-## Error Handling
-
-### Common Errors
-
-- **400 Bad Request**: Неверный формат запроса или отсутствуют обязательные параметры.
-- **404 Not Found**: Запрашиваемый ресурс не найден.
-- **500 Internal Server Error**: Внутренняя ошибка сервера.
-
-**Error Response Example:**
-```json
-{
-    "error": "Resource not found"
-}
-```
-
----
-
-## Testing
-Для запуска тестов добавьте параметр `test=1` в URL:
-```
-http://yourdomain.com/api/index.php?test=1
-```
-
----
-
-## Dependencies
-- PHP 7.4 или выше.
-- MongoDB (версия 1.6 или выше).
-- Библиотека `mongodb/mongodb` для работы с MongoDB.
-
----
-
-## Support
-Для вопросов или проблем, свяжитесь с разработчиком.
-
----
-
-Если нужно что-то уточнить или дополнить, дайте знать!
-
+This documentation covers all the API endpoints and their usage, with all methods using the `POST` HTTP method. For further assistance, refer to the source code or contact the development team.
