@@ -1,9 +1,3 @@
-### Updated API Documentation (Using POST for All Methods)
-
-This document provides detailed information about the API endpoints, request/response formats, and examples for the provided application structure. All methods now use the `POST` HTTP method.
-
----
-
 ## **Base URL**
 All API requests should be made to the base URL:
 ```
