@@ -1,7 +1,7 @@
 ## **Base URL**
 All API requests should be made to the base URL:
 ```
-http://localhost:3000/
+http://localhost/
 ```
 
 ---
@@ -192,7 +192,7 @@ Manages view history-related operations.
 
 ### **Create Business Card**
 ```bash
-curl -X POST http://localhost:3000/ \
+curl -X POST http://localhost/ \
   -H "Content-Type: application/json" \
   -d '{
     "action": "businessCard.create",
@@ -208,7 +208,7 @@ curl -X POST http://localhost:3000/ \
 
 ### **Read Business Card**
 ```bash
-curl -X POST http://localhost:3000/ \
+curl -X POST http://localhost/ \
   -H "Content-Type: application/json" \
   -d '{
     "action": "businessCard.read",
@@ -218,7 +218,7 @@ curl -X POST http://localhost:3000/ \
 
 ### **Update Business Card**
 ```bash
-curl -X POST http://localhost:3000/ \
+curl -X POST http://localhost/ \
   -H "Content-Type: application/json" \
   -d '{
     "action": "businessCard.update",
@@ -234,7 +234,7 @@ curl -X POST http://localhost:3000/ \
 
 ### **Delete Business Card**
 ```bash
-curl -X POST http://localhost:3000/ \
+curl -X POST http://localhost/ \
   -H "Content-Type: application/json" \
   -d '{
     "action": "businessCard.delete",
@@ -244,7 +244,7 @@ curl -X POST http://localhost:3000/ \
 
 ### **Add View History**
 ```bash
-curl -X POST http://localhost:3000/ \
+curl -X POST http://localhost/ \
   -H "Content-Type: application/json" \
   -d '{
     "action": "viewHistory.addView",
@@ -255,7 +255,7 @@ curl -X POST http://localhost:3000/ \
 
 ### **Get View History**
 ```bash
-curl -X POST http://localhost:3000/ \
+curl -X POST http://localhost/ \
   -H "Content-Type: application/json" \
   -d '{
     "action": "viewHistory.getViews",
